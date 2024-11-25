@@ -235,13 +235,16 @@ export default class EventListRepository {
     const conditions = [];
     const values = [];
 
+    // Add more detailed logging
+    console.log('Raw filters received:', { name, category, startdate, tag, limit, offset });
+
     if (name) {
         values.push(`%${name}%`);
         conditions.push(`e.name ILIKE $${values.length}`);
     }
     if (category) {
-        values.push(`%${category}%`);
-        conditions.push(`c.name ILIKE $${values.length}`);
+        values.push(category);
+        conditions.push(`e.id_event_category = $${values.length}`);
     }
     if (startdate) {
         values.push(startdate);
@@ -272,26 +275,35 @@ export default class EventListRepository {
     values.push(limit, offset);
 
     try {
-      await client.connect();
-      const res = await client.query(query, values);
+        console.log('Executing query with values:', values);
+        console.log('Full query:', query);
 
-      const countQuery = `
-          SELECT COUNT(*)
-          FROM events e
-          JOIN event_categories c ON e.id_event_category = c.id
-          LEFT JOIN event_tags et ON e.id = et.id_event
-          LEFT JOIN tags t ON et.id_tag = t.id
-          ${whereClause}
-      `;
-      const countRes = await client.query(countQuery, values.slice(0, values.length - 2));
-      const total = parseInt(countRes.rows[0].count, 100);
+        await client.connect();
+        const res = await client.query(query, values);
 
-      return {
-        events: res.rows,
-        total
-      };
+        const countQuery = `
+            SELECT COUNT(*)
+            FROM events e
+            JOIN event_categories c ON e.id_event_category = c.id
+            LEFT JOIN event_tags et ON e.id = et.id_event
+            LEFT JOIN tags t ON et.id_tag = t.id
+            ${whereClause}
+        `;
+        const countRes = await client.query(countQuery, values.slice(0, values.length - 2));
+        const total = parseInt(countRes.rows[0].count, 10);
+
+        console.log('Query results:', res.rows);
+        console.log('Total count:', total);
+
+        return {
+            events: res.rows,
+            total
+        };
+    } catch (error) {
+        console.error('Error in getEventsAsync:', error);
+        throw error;
     } finally {
-      await client.end();
+        await client.end();
     }
   };
 }

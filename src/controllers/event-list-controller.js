@@ -47,11 +47,11 @@ router.get('/', async (req, res) => {
   console.log("Query params:", req.query);
   const filters = {
     name: req.query.name,
-    category: req.query.category,
+    category: req.query.category ? parseInt(req.query.category, 10) : undefined, 
     startdate: req.query.start_date, 
     tag: req.query.tag,
-    limit: parseInt(req.query.limit, 100) || 100,
-    offset: parseInt(req.query.offset, 100) || 0,
+    limit: parseInt(req.query.limit || '100', 10),
+    offset: parseInt(req.query.offset || '0', 10),
   };
   console.log("Filters:", filters);
 
@@ -61,7 +61,7 @@ router.get('/', async (req, res) => {
     if (result && result.events.length > 0) {
       res.status(200).json(result);
     } else {
-      res.status(404).send('No se encontraron eventos');
+      res.status(200).json({ events: [], total: 0 }); // Cambiar a 200 y devolver array vacío
     }
   } catch (error) {
     console.error("Error in controller:", error);

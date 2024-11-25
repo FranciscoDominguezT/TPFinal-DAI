@@ -21,7 +21,10 @@ const Navbar = () => {
         <Ionicons name="calendar-outline" size={24} color="black" />
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.iconContainer}>
+      <TouchableOpacity 
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate('Categories')}
+        >
         <Ionicons name="search-outline" size={24} color="black" />
       </TouchableOpacity>
       
