@@ -7,9 +7,9 @@ export default class EventEnrollmentService {
         return result;
     } 
 
-    deleteAsync = async (id) => {
+    deleteAsync = async (eventId, userId) => {
         const repo = new EventEnrollmentRepository();
-        const returnArray = await repo.deleteAsync(id);
+        const returnArray = await repo.deleteAsync(eventId, userId);
         return returnArray;
     }
 
@@ -24,4 +24,10 @@ export default class EventEnrollmentService {
         const returnArray = await repo.updateAsync(eventId, entity, rating);
         return returnArray;
       }
+
+    checkEnrollmentStatus  = async (eventId, userId) => {
+        const repo = new EventEnrollmentRepository();
+        const returnArray = await repo.checkEnrollmentStatus (eventId, userId);
+        return returnArray;
+    }
 }

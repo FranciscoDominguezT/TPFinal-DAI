@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Navbar from '../components/Navbar';
 
 export default function EventScreen({ navigation }) {
   const [events, setEvents] = useState([]);
@@ -24,7 +25,7 @@ export default function EventScreen({ navigation }) {
 
         setEvents(response.data.events);
       } catch (err) {
-        setError(`Error: ${err.message}`);
+        Alert.alert('Error', err.message);
       }
     };
 
@@ -41,7 +42,7 @@ export default function EventScreen({ navigation }) {
         data={events}
         keyExtractor={(item, index) => `${item.id}-${index}`}
         renderItem={({ item }) => {
-          console.log('Evento renderizado:', item); 
+          // console.log('Evento renderizado:', item); 
           return (
             <View style={styles.eventItem}>
               <Text style={styles.eventText}>Evento número {item.id}</Text>
@@ -50,21 +51,19 @@ export default function EventScreen({ navigation }) {
               <Button 
                 title="Ver detalles" 
                 onPress={() => {
-                  console.log('Navegando a detalles de evento con ID:', item.id); 
-                  navigation.navigate('EventDetail', { eventId: item.id });
-                }} 
+                  const eventDate = new Date(item.start_date);
+                  const isPastEvent = eventDate < new Date();
+                  navigation.navigate(
+                    isPastEvent ? 'EventDetailII' : 'EventDetail', 
+                    { eventId: item.id }
+                  );
+                }}
               />
             </View>
           );
         }}
       />
-      <Button
-        title="Cerrar sesión"
-        onPress={async () => {
-          await AsyncStorage.removeItem('userToken');
-          navigation.navigate('Login');
-        }}
-      />
+      <Navbar />
     </View>
   );
 }
@@ -78,6 +77,7 @@ const styles = StyleSheet.create({
   loginA: {
     backgroundColor: '#cfc0fe',
     padding: 16,
+    marginTop: 40,
   },
   loginText: {
     textAlign: "center",

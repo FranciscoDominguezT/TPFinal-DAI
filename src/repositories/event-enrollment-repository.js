@@ -31,22 +31,24 @@ export default class EventEnrollmentRepository {
     return returnArray;
   }
 
-  deleteAsync = async (id)  => {
+  deleteAsync = async (eventId, userId) => {
     let returnArray = null;
     const client = new Client(DBConfig);
 
     try {
       await client.connect();
-      const sql = 'DELETE FROM event_enrollments WHERE id_event = $1';
-      const values = [id];
-      console.log("Executing SQL:", sql);
-      console.log("With values:", values);
+      const sql = 'DELETE FROM event_enrollments WHERE id_event = $1 AND id_user = $2 RETURNING *';
+      const values = [eventId, userId];
+      
+      console.log("Executing delete enrollment with values:", { eventId, userId });
+      
       const result = await client.query(sql, values);
-      await client.end();
-      returnArray = result.rows;
+      returnArray = result.rowCount > 0 ? { success: true } : null;
     } catch (error) {
-      console.log(error);
-    } 
+      console.error("Error in deleteEnrollmentAsync:", error);
+    } finally {
+      await client.end();
+    }
     return returnArray;
   }
 
@@ -87,5 +89,24 @@ export default class EventEnrollmentRepository {
       console.log(error);
     } 
     return returnArray;
+  }
+
+  checkEnrollmentStatus = async (eventId, userId) => {
+    const client = new Client(DBConfig);
+    try {
+      await client.connect();
+      const sql = "SELECT * FROM event_enrollments WHERE id_event = $1 AND id_user = $2";
+      const values = [eventId, userId];
+      
+      console.log("Checking enrollment status with values:", { eventId, userId });
+      
+      const result = await client.query(sql, values);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error("Error in checkEnrollmentStatus:", error);
+      return null;
+    } finally {
+      await client.end();
+    }
   }
 }

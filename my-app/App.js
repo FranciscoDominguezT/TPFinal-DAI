@@ -4,6 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './screens/LoginScreen';
 import EventScreen from './screens/EventScreen';
 import EventDetailScreen from './screens/EventDetailScreen';
+import EventDetailScreenII from './screens/EventDetailScreenII';
+import ProfileScreen from './screens/ProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -11,9 +13,11 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Events" component={EventScreen} />
-        <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Events" component={EventScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EventDetail" component={EventDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EventDetailII" component={EventDetailScreenII} options={{ headerShown: false }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
